@@ -23,8 +23,8 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
-        id="cordova-plugin-local-notification"
-        version="0.9.0-beta.3">
+        id="hrs-cordova-plugin-local-notification"
+        version="0.9.0-beta.4">
 
     <name>LocalNotification</name>
 
@@ -61,8 +61,7 @@
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="LocalNotification">
-                <param name="ios-package" value="APPLocalNotification" onload="true" />
-                <param name="onload" value="true" />
+                <param name="ios-package" value="APPLocalNotification" />
             </feature>
         </config-file>
 
