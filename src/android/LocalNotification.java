@@ -91,7 +91,6 @@ public class LocalNotification extends CordovaPlugin {
     @Override
     public void onResume (boolean multitasking) {
         super.onResume(multitasking);
-        deviceready();
     }
 
     /**
