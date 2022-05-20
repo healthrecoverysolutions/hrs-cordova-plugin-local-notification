@@ -120,6 +120,10 @@
 
             <service
                 android:name="de.appplant.cordova.plugin.localnotification.ClickReceiver"
+                android:exported="false" android:launchMode="singleInstance" android:theme="@android:style/Theme.Translucent" />
+                
+            <activity
+                android:name="de.appplant.cordova.plugin.notification.receiver.NotificationClickActivity"
                 android:exported="false" />
 
             <receiver
@@ -184,6 +188,10 @@
 
         <source-file
             src="src/android/notification/receiver/AbstractTriggerReceiver.java"
+            target-dir="src/de/appplant/cordova/plugin/notification/receiver" />
+            
+        <source-file
+            src="src/android/notification/receiver/NotificationClickActivity.java"
             target-dir="src/de/appplant/cordova/plugin/notification/receiver" />
 
         <source-file
