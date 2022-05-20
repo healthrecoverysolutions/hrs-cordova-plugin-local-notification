@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Random;
 
 import de.appplant.cordova.plugin.notification.action.Action;
+import de.appplant.cordova.plugin.notification.receiver.NotificationClickActivity;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static de.appplant.cordova.plugin.notification.Notification.EXTRA_UPDATE;
@@ -387,6 +388,20 @@ public final class Builder {
     }
 
     /**
+     * For notification trampoline restrictions from android 12, we cannot start activity from service
+     * or broadcast receivers. Thus, we are providing an activity to handle the pending intent
+     * of launching the app.
+     * @return the click receiver based on OS version
+     */
+    private Class<?> getClickReceiver() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            return NotificationClickActivity.class;
+        } else {
+            return clickActivity;
+        }
+    }
+
+    /**
      * Set intent to handle the click event. Will bring the app to
      * foreground.
      *
@@ -394,25 +409,26 @@ public final class Builder {
      */
     private void applyContentReceiver(NotificationCompat.Builder builder) {
 
-        if (clickActivity == null)
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S && clickActivity == null)
             return;
 
-        Intent intent = new Intent(context, clickActivity)
-                .putExtra(Notification.EXTRA_ID, options.getId())
-                .putExtra(Action.EXTRA_ID, Action.CLICK_ACTION_ID)
-                .putExtra(Options.EXTRA_LAUNCH, options.isLaunchingApp())
-                .setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        Intent intent = new Intent(context, getClickReceiver())
+            .putExtra(Notification.EXTRA_ID, options.getId())
+            .putExtra(Action.EXTRA_ID, Action.CLICK_ACTION_ID)
+            .putExtra(Options.EXTRA_LAUNCH, options.isLaunchingApp())
+            .setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
-        if (extras != null) {
+       if (extras != null) {
             intent.putExtras(extras);
         }
 
         int reqCode = random.nextInt();
 
         PendingIntent contentIntent ;
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            contentIntent = PendingIntent.getService(
-                context, reqCode, intent, PendingIntent.FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
+            contentIntent = PendingIntent.getActivity(context, reqCode, intent,
+                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         } else {
             contentIntent  = PendingIntent.getService(
                 context, reqCode, intent, FLAG_UPDATE_CURRENT);
@@ -453,7 +469,7 @@ public final class Builder {
      * @param action Notification action needing the PendingIntent
      */
     private PendingIntent getPendingIntentForAction (Action action) {
-        Intent intent = new Intent(context, clickActivity)
+        Intent intent = new Intent(context, getClickReceiver())
                 .putExtra(Notification.EXTRA_ID, options.getId())
                 .putExtra(Action.EXTRA_ID, action.getId())
                 .putExtra(Options.EXTRA_LAUNCH, action.isLaunchingApp())
@@ -466,9 +482,9 @@ public final class Builder {
         int reqCode = random.nextInt();
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            return PendingIntent.getService(
-                context, reqCode, intent, PendingIntent.FLAG_IMMUTABLE | FLAG_UPDATE_CURRENT);
-        } else {
+            return PendingIntent.getActivity(context, reqCode, intent,
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        }  else {
             return PendingIntent.getService(
                 context, reqCode, intent, FLAG_UPDATE_CURRENT);
         }

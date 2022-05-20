@@ -533,7 +533,7 @@ public class LocalNotification extends CordovaPlugin {
      * @param toast Optional notification to pass with.
      * @param data  Event object with additional data.
      */
-    static void fireEvent (String event, Notification toast, JSONObject data) {
+    public static void fireEvent (String event, Notification toast, JSONObject data) {
         String params, js;
 
         try {
