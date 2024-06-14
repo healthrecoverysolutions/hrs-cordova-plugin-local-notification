@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import de.appplant.cordova.plugin.notification.Notification;
 import de.appplant.cordova.plugin.notification.receiver.AbstractClickReceiver;
+import timber.log.Timber;
 
 import static de.appplant.cordova.plugin.localnotification.LocalNotification.fireEvent;
 import static de.appplant.cordova.plugin.notification.Options.EXTRA_LAUNCH;
@@ -49,6 +50,7 @@ public class ClickReceiver extends AbstractClickReceiver {
      */
     @Override
     public void onClick(Notification notification, Bundle bundle) {
+        Timber.d("LocalNotification: onClick");
         String action   = getAction();
         JSONObject data = new JSONObject();
 

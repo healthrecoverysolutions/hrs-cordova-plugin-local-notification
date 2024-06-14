@@ -48,6 +48,7 @@ import de.appplant.cordova.plugin.notification.Notification;
 import de.appplant.cordova.plugin.notification.Options;
 import de.appplant.cordova.plugin.notification.Request;
 import de.appplant.cordova.plugin.notification.action.ActionGroup;
+import timber.log.Timber;
 
 import static de.appplant.cordova.plugin.notification.Notification.Type.SCHEDULED;
 import static de.appplant.cordova.plugin.notification.Notification.Type.TRIGGERED;
@@ -267,6 +268,7 @@ public class LocalNotification extends CordovaPlugin {
             JSONObject dict    = toasts.optJSONObject(i);
             Options options    = new Options(dict);
             Request request    = new Request(options);
+            Timber.d("Scheduling Local Notification for " + request.toString());
             Notification toast = mgr.schedule(request, TriggerReceiver.class);
 
             if (toast != null) {
@@ -556,6 +558,7 @@ public class LocalNotification extends CordovaPlugin {
 
         js = "cordova.plugins.notification.local.fireEvent(" +
                 "\"" + event + "\"," + params + ")";
+        Timber.d("FireEvent " + js);
 
         if (launchDetails == null && !deviceready && toast != null) {
             launchDetails = new Pair<Integer, String>(toast.getId(), event);
@@ -581,6 +584,7 @@ public class LocalNotification extends CordovaPlugin {
         ((Activity)(view.getContext())).runOnUiThread(new Runnable() {
             public void run() {
                 view.loadUrl("javascript:" + js);
+                Timber.d("Send Javascript : " + js);
             }
         });
     }

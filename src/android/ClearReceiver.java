@@ -25,6 +25,7 @@ import android.os.Bundle;
 
 import de.appplant.cordova.plugin.notification.Notification;
 import de.appplant.cordova.plugin.notification.receiver.AbstractClearReceiver;
+import timber.log.Timber;
 
 import static de.appplant.cordova.plugin.localnotification.LocalNotification.fireEvent;
 import static de.appplant.cordova.plugin.localnotification.LocalNotification.isAppRunning;
@@ -46,7 +47,7 @@ public class ClearReceiver extends AbstractClearReceiver {
     @Override
     public void onClear (Notification notification, Bundle bundle) {
         boolean isLast = bundle.getBoolean(EXTRA_LAST, false);
-
+        Timber.d("LocalNotification: onClear");
         if (isLast) {
             notification.cancel();
         } else {

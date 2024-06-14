@@ -33,6 +33,7 @@ import de.appplant.cordova.plugin.notification.Notification;
 import de.appplant.cordova.plugin.notification.Options;
 import de.appplant.cordova.plugin.notification.Request;
 import de.appplant.cordova.plugin.notification.receiver.AbstractTriggerReceiver;
+import timber.log.Timber;
 
 import static android.content.Context.POWER_SERVICE;
 import static android.os.Build.VERSION.SDK_INT;
@@ -58,6 +59,7 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
      */
     @Override
     public void onTrigger (Notification notification, Bundle bundle) {
+        Timber.d("OnTrigger " + notification.getId());
         boolean isUpdate = bundle.getBoolean(Notification.EXTRA_UPDATE, false);
         Context context  = notification.getContext();
         Options options  = notification.getOptions();
@@ -73,7 +75,7 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
         }
 
         notification.show();
-
+        Timber.d("Will Now show Notification : " + notification.toString());
         if (!isUpdate && isAppRunning()) {
             fireEvent("trigger", notification);
         }
