@@ -75,6 +75,7 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
         }
 
         notification.show();
+
         Timber.d("Displayed Notification : " + notification.toString());
         if (!isUpdate && isAppRunning()) {
             fireEvent("trigger", notification);

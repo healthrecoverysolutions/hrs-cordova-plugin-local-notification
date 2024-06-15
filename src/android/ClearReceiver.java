@@ -47,7 +47,7 @@ public class ClearReceiver extends AbstractClearReceiver {
     @Override
     public void onClear (Notification notification, Bundle bundle) {
         boolean isLast = bundle.getBoolean(EXTRA_LAST, false);
-        Timber.d("LocalNotification: onClear");
+        Timber.d("onClear Notification id"+ (notification!=null ? notification.getId() : " NA"));
         if (isLast) {
             notification.cancel();
         } else {

@@ -34,7 +34,7 @@ import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.util.ArraySet;
 import android.support.v4.util.Pair;
-import android.util.Log;
+
 import android.util.SparseArray;
 
 import org.json.JSONException;
