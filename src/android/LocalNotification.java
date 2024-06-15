@@ -268,9 +268,8 @@ public class LocalNotification extends CordovaPlugin {
             JSONObject dict    = toasts.optJSONObject(i);
             Options options    = new Options(dict);
             Request request    = new Request(options);
-            Timber.d("Scheduling Local Notification for " + request.toString());
             Notification toast = mgr.schedule(request, TriggerReceiver.class);
-
+            Timber.d("Scheduling Local Notification for id " + (toast!=null ? toast.getId() : " NA"));
             if (toast != null) {
                 fireEvent("add", toast);
             }

@@ -50,7 +50,7 @@ public class ClickReceiver extends AbstractClickReceiver {
      */
     @Override
     public void onClick(Notification notification, Bundle bundle) {
-        Timber.d("LocalNotification: onClick");
+        Timber.d("onClick Notification id "+ (notification!=null ? notification.getId() : " NA"));
         String action   = getAction();
         JSONObject data = new JSONObject();
 

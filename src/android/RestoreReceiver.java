@@ -50,7 +50,7 @@ public class RestoreReceiver extends AbstractRestoreReceiver {
      */
     @Override
     public void onRestore (Request request, Notification toast) {
-        Timber.d("onRestore: will restore the notifications");
+        Timber.d("onRestore: will restore the notification " + (toast!=null ? toast.getId() : "no notification"));
         Date date     = request.getTriggerDate();
         Timber.d("Restore notification for date " + date);
         boolean after = date != null && date.after(new Date());
