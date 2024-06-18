@@ -34,7 +34,7 @@ import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.util.ArraySet;
 import android.support.v4.util.Pair;
-import android.util.Log;
+
 import android.util.SparseArray;
 
 import org.json.JSONException;
@@ -54,7 +54,7 @@ import static android.os.Build.VERSION_CODES.M;
 import static android.support.v4.app.NotificationCompat.PRIORITY_HIGH;
 import static android.support.v4.app.NotificationCompat.PRIORITY_MAX;
 import static android.support.v4.app.NotificationCompat.PRIORITY_MIN;
-
+import timber.log.Timber;
 /**
  * Wrapper class around OS notification class. Handles basic operations
  * like show, delete, cancel for a single local notification instance.
@@ -197,7 +197,7 @@ public final class Notification {
             do {
                 Date date = request.getTriggerDate();
 
-                Log.d("local-notification", "Next trigger at: " + date);
+                Timber.d("Local Notification - Scheduled to Next trigger at: " + date);
 
                 if (date == null)
                     continue;
@@ -262,6 +262,8 @@ public final class Notification {
                         // can crash the app
                     }
             }
+        } else {
+            Timber.e("Alarm permission not provided thus wont schedule local notifications");
         }
     }
 

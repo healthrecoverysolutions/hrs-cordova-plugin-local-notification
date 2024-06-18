@@ -33,6 +33,7 @@ import de.appplant.cordova.plugin.notification.Manager;
 import de.appplant.cordova.plugin.notification.Notification;
 import de.appplant.cordova.plugin.notification.Request;
 import de.appplant.cordova.plugin.notification.receiver.AbstractRestoreReceiver;
+import timber.log.Timber;
 
 /**
  * This class is triggered upon reboot of the device. It needs to re-register
@@ -49,12 +50,16 @@ public class RestoreReceiver extends AbstractRestoreReceiver {
      */
     @Override
     public void onRestore (Request request, Notification toast) {
+        Timber.d("onRestore: will restore the notification " + (toast!=null ? toast.getId() : "no notification"));
         Date date     = request.getTriggerDate();
+        Timber.d("Restore notification for date " + date);
         boolean after = date != null && date.after(new Date());
 
         if (!after && toast.isHighPrio()) {
+            Timber.d("Showing restored notification " + toast.toString());
             toast.show();
         } else {
+            Timber.d("Clearing restored notification " + toast.toString());
             toast.clear();
         }
 
