@@ -102,7 +102,7 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
                         tts.setLanguage(new Locale(localeArgs[0], localeArgs[1]));
                     }
 
-                    String title = options.getTitle();å
+                    String title = options.getTitle();
                     if (!title.isEmpty()) {
                         tts.speak(options.getTitle(), TextToSpeech.QUEUE_FLUSH, null, "REMINDER_ID");
                     }
