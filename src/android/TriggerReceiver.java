@@ -27,6 +27,7 @@ import android.os.PowerManager;
 import android.speech.tts.TextToSpeech;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 import de.appplant.cordova.plugin.notification.Builder;
 import de.appplant.cordova.plugin.notification.Manager;
@@ -44,6 +45,8 @@ import static de.appplant.cordova.plugin.localnotification.LocalNotification.isA
 import static java.util.Calendar.MINUTE;
 
 import com.hrs.patient.BuildConfig;
+
+import org.json.JSONException;
 
 /**
  * The alarm receiver is triggered when a scheduled alarm is fired. This class
@@ -81,10 +84,28 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
 
         notification.show();
 
+        // reads out reminders when the app is closed DEV-20332
         if (!isAppRunning() & BuildConfig.KNOXMANAGE) {
             tts = new TextToSpeech(context.getApplicationContext(), status -> {
                 if (status == TextToSpeech.SUCCESS) {
-                    tts.speak(notification.getOptions().getTitle(), TextToSpeech.QUEUE_FLUSH, null, "REMINDER_ID_1");
+                    String locale = null;
+                    try {
+                        locale = options.getDict().getString("locale");
+                        Timber.d("onTrigger() => Locale provided, using %s", locale);
+                    } catch (JSONException e) {
+                        Timber.e("onTrigger() => Missing User locale, using default language tag");
+                        locale = Locale.getDefault().toLanguageTag();
+                    }
+
+                    String[] localeArgs = locale.split("-");
+                    if (localeArgs.length == 2) {
+                        tts.setLanguage(new Locale(localeArgs[0], localeArgs[1]));
+                    }
+
+                    String title = options.getTitle();å
+                    if (!title.isEmpty()) {
+                        tts.speak(options.getTitle(), TextToSpeech.QUEUE_FLUSH, null, "REMINDER_ID");
+                    }
                 }
             });
         }
