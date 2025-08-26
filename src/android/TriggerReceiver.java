@@ -24,6 +24,7 @@ package de.appplant.cordova.plugin.localnotification;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.speech.tts.TextToSpeech;
 
 import java.util.Calendar;
 
@@ -42,6 +43,8 @@ import static de.appplant.cordova.plugin.localnotification.LocalNotification.fir
 import static de.appplant.cordova.plugin.localnotification.LocalNotification.isAppRunning;
 import static java.util.Calendar.MINUTE;
 
+import com.hrs.patient.BuildConfig;
+
 /**
  * The alarm receiver is triggered when a scheduled alarm is fired. This class
  * reads the information in the intent and displays this information in the
@@ -49,6 +52,8 @@ import static java.util.Calendar.MINUTE;
  * sound and it vibrates the phone.
  */
 public class TriggerReceiver extends AbstractTriggerReceiver {
+
+    private TextToSpeech tts;
 
     /**
      * Called when a local notification was triggered. Does present the local
@@ -75,6 +80,14 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
         }
 
         notification.show();
+
+        if (!isAppRunning() & BuildConfig.KNOXMANAGE) {
+            tts = new TextToSpeech(context.getApplicationContext(), status -> {
+                if (status == TextToSpeech.SUCCESS) {
+                    tts.speak(notification.getOptions().getTitle(), TextToSpeech.QUEUE_FLUSH, null, "REMINDER_ID_1");
+                }
+            });
+        }
 
         Timber.d("Displayed Notification : " + notification.toString());
         if (!isUpdate && isAppRunning()) {
