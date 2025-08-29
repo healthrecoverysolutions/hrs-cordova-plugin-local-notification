@@ -22,9 +22,11 @@
 package de.appplant.cordova.plugin.localnotification;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -47,6 +49,7 @@ import static java.util.Calendar.MINUTE;
 import com.hrs.patient.BuildConfig;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * The alarm receiver is triggered when a scheduled alarm is fired. This class
@@ -56,7 +59,9 @@ import org.json.JSONException;
  */
 public class TriggerReceiver extends AbstractTriggerReceiver {
 
+    private static final String ACTION_TEXT_TO_SPEECH = "actionTextToSpeech";
     private TextToSpeech tts;
+    private JSONObject notificationData;
 
     /**
      * Called when a local notification was triggered. Does present the local
@@ -85,29 +90,9 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
         notification.show();
 
         // reads out reminders when the app is closed DEV-20332
+
         if (!isAppRunning() & BuildConfig.KNOXMANAGE) {
-            tts = new TextToSpeech(context.getApplicationContext(), status -> {
-                if (status == TextToSpeech.SUCCESS) {
-                    String locale = null;
-                    try {
-                        locale = options.getDict().getString("locale");
-                        Timber.d("onTrigger() => Locale provided, using %s", locale);
-                    } catch (JSONException e) {
-                        Timber.e("onTrigger() => Missing User locale, using default language tag");
-                        locale = Locale.getDefault().toLanguageTag();
-                    }
-
-                    String[] localeArgs = locale.split("-");
-                    if (localeArgs.length == 2) {
-                        tts.setLanguage(new Locale(localeArgs[0], localeArgs[1]));
-                    }
-
-                    String title = options.getTitle();
-                    if (!title.isEmpty()) {
-                        tts.speak(options.getTitle(), TextToSpeech.QUEUE_FLUSH, null, "REMINDER_ID");
-                    }
-                }
-            });
+            triggerTextToSpeech(context, options);
         }
 
         Timber.d("Displayed Notification : " + notification.toString());
@@ -123,6 +108,70 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
         Request req  = new Request(options, cal.getTime());
 
         manager.schedule(req, this.getClass());
+    }
+
+    private void triggerTextToSpeech(Context context, Options options) {
+        boolean shouldReadNotification = false;
+        try {
+            notificationData = new JSONObject(options.getDict().getString("data"));
+            shouldReadNotification = notificationData.getBoolean("tts");
+        } catch (JSONException e) {
+            Timber.e("triggerTextToSpeech() => Error parsing json%s", e.getMessage());
+        }
+
+        if (!shouldReadNotification) {
+            return;
+        }
+
+        tts = new TextToSpeech(context.getApplicationContext(), status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                String locale = null;
+                try {
+                    locale = notificationData.getString("locale");
+                    Timber.d("onTrigger() => Locale provided, using %s", locale);
+                } catch (JSONException e) {
+                    Timber.e("onTrigger() => Missing User locale, using default language tag");
+                    locale = Locale.getDefault().toLanguageTag();
+                }
+
+                String[] localeArgs = locale.split("-");
+                if (localeArgs.length == 2) {
+                    tts.setLanguage(new Locale(localeArgs[0], localeArgs[1]));
+                }
+
+                String title = options.getTitle();
+                if (!title.isEmpty()) {
+                    tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                        @Override
+                        public void onStart(String utteranceId) {
+                            Timber.d("TTS started: %s", utteranceId);
+                        }
+
+                        @Override
+                        public void onDone(String utteranceId) {
+                            Timber.d("TTS done: %s", utteranceId);
+                            shutdownTTS();
+                        }
+
+                        @Override
+                        public void onError(String utteranceId) {
+                            Timber.e("TTS error: %s", utteranceId);
+                            shutdownTTS();
+                        }
+                    });
+
+                    tts.speak(options.getTitle(), TextToSpeech.QUEUE_FLUSH, null, "REMINDER_ID");
+                }
+            }
+        });
+    }
+
+    private void shutdownTTS() {
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+            tts = null;
+        }
     }
 
     /**
