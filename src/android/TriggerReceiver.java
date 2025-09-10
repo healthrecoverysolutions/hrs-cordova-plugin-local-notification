@@ -187,7 +187,7 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
                     | PowerManager.ACQUIRE_CAUSES_WAKEUP;
 
         PowerManager.WakeLock wakeLock = pm.newWakeLock(
-                level, "LocalNotification");
+                level, "pcm:TriggerReceiverWakeLock");
 
         wakeLock.setReferenceCounted(false);
         wakeLock.acquire(1000);
