@@ -22,7 +22,6 @@
 package de.appplant.cordova.plugin.localnotification;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.speech.tts.TextToSpeech;
@@ -42,11 +41,10 @@ import timber.log.Timber;
 import static android.content.Context.POWER_SERVICE;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static org.apache.cordova.BuildHelper.getBuildConfigValue;
 import static de.appplant.cordova.plugin.localnotification.LocalNotification.fireEvent;
 import static de.appplant.cordova.plugin.localnotification.LocalNotification.isAppRunning;
 import static java.util.Calendar.MINUTE;
-
-import com.hrs.patient.BuildConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,8 +88,8 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
         notification.show();
 
         // reads out reminders when the app is closed DEV-20332
-
-        if (!isAppRunning() & BuildConfig.KNOXMANAGE) {
+        Boolean isKnoxManage = (Boolean) getBuildConfigValue(context.getApplicationContext(), "KNOXMANAGE");
+        if (!isAppRunning() & Boolean.TRUE.equals(isKnoxManage)) {
             triggerTextToSpeech(context, options);
         }
 
