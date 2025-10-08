@@ -109,9 +109,10 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
     }
 
     private void triggerTextToSpeech(Context context, Options options) {
+        Timber.d("triggerTextToSpeech()");
         boolean shouldReadNotification = false;
         try {
-            notificationData = new JSONObject(options.getDict().getString("data"));
+            notificationData = new JSONObject(options.getDict().getString("tts"));
             shouldReadNotification = notificationData.getBoolean("tts");
         } catch (JSONException e) {
             Timber.e("triggerTextToSpeech() => Error parsing json%s", e.getMessage());
@@ -126,9 +127,9 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
                 String locale = null;
                 try {
                     locale = notificationData.getString("locale");
-                    Timber.d("onTrigger() => Locale provided, using %s", locale);
+                    Timber.d("triggerTextToSpeech() => Locale provided, using %s", locale);
                 } catch (JSONException e) {
-                    Timber.e("onTrigger() => Missing User locale, using default language tag");
+                    Timber.e("triggerTextToSpeech() => Missing User locale, using default language tag");
                     locale = Locale.getDefault().toLanguageTag();
                 }
 
@@ -184,10 +185,10 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
             return;
 
         int level =   PowerManager.SCREEN_DIM_WAKE_LOCK
-                    | PowerManager.ACQUIRE_CAUSES_WAKEUP;
+            | PowerManager.ACQUIRE_CAUSES_WAKEUP;
 
         PowerManager.WakeLock wakeLock = pm.newWakeLock(
-                level, "pcm:TriggerReceiverWakeLock");
+            level, "pcm:TriggerReceiverWakeLock");
 
         wakeLock.setReferenceCounted(false);
         wakeLock.acquire(1000);
@@ -208,10 +209,9 @@ public class TriggerReceiver extends AbstractTriggerReceiver {
     @Override
     public Notification buildNotification (Builder builder, Bundle bundle) {
         return builder
-                .setClickActivity(ClickReceiver.class)
-                .setClearReceiver(ClearReceiver.class)
-                .setExtras(bundle)
-                .build();
+            .setClickActivity(ClickReceiver.class)
+            .setClearReceiver(ClearReceiver.class)
+            .setExtras(bundle)
+            .build();
     }
-
 }
